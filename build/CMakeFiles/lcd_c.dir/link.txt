@@ -1,1 +1,0 @@
-/usr/bin/cc CMakeFiles/lcd_c.dir/main.c.o -o /home/spyros/Projects/lcd_c/bin/lcd_c  lib/st7735s_driver/libst7735s_driver.a -lm 
