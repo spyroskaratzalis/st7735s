@@ -1,0 +1,41 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/st7735s_driver.dir/Config/DEV_Config.c.o"
+  "CMakeFiles/st7735s_driver.dir/Config/DEV_Config.c.o.d"
+  "CMakeFiles/st7735s_driver.dir/Config/KEY_1in44_test.c.o"
+  "CMakeFiles/st7735s_driver.dir/Config/KEY_1in44_test.c.o.d"
+  "CMakeFiles/st7735s_driver.dir/Config/LCD_1in44_test.c.o"
+  "CMakeFiles/st7735s_driver.dir/Config/LCD_1in44_test.c.o.d"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font12.c.o"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font12.c.o.d"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font12CN.c.o"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font12CN.c.o.d"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font16.c.o"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font16.c.o.d"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font20.c.o"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font20.c.o.d"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font24.c.o"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font24.c.o.d"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font24CN.c.o"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font24CN.c.o.d"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font48.c.o"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font48.c.o.d"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font50.c.o"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font50.c.o.d"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font8.c.o"
+  "CMakeFiles/st7735s_driver.dir/Fonts/font8.c.o.d"
+  "CMakeFiles/st7735s_driver.dir/GUI/GUI_BMP.c.o"
+  "CMakeFiles/st7735s_driver.dir/GUI/GUI_BMP.c.o.d"
+  "CMakeFiles/st7735s_driver.dir/GUI/GUI_Paint.c.o"
+  "CMakeFiles/st7735s_driver.dir/GUI/GUI_Paint.c.o.d"
+  "CMakeFiles/st7735s_driver.dir/GUI/KEY_APP.c.o"
+  "CMakeFiles/st7735s_driver.dir/GUI/KEY_APP.c.o.d"
+  "CMakeFiles/st7735s_driver.dir/LCD/LCD_1in44.c.o"
+  "CMakeFiles/st7735s_driver.dir/LCD/LCD_1in44.c.o.d"
+  "libst7735s_driver.a"
+  "libst7735s_driver.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang C)
+  include(CMakeFiles/st7735s_driver.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

@@ -1,0 +1,6 @@
+/home/spyros/Projects/lcd_c/build/CMakeFiles/lcd_c.dir
+/home/spyros/Projects/lcd_c/build/CMakeFiles/edit_cache.dir
+/home/spyros/Projects/lcd_c/build/CMakeFiles/rebuild_cache.dir
+/home/spyros/Projects/lcd_c/build/lib/st7735s_driver/CMakeFiles/st7735s_driver.dir
+/home/spyros/Projects/lcd_c/build/lib/st7735s_driver/CMakeFiles/edit_cache.dir
+/home/spyros/Projects/lcd_c/build/lib/st7735s_driver/CMakeFiles/rebuild_cache.dir
