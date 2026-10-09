@@ -1,54 +1,41 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <signal.h>
-#include <stdbool.h>
-#include "st7735s/input.h"
-
-static volatile bool running = true;
-
-static void handle_sigint(int sig) {
-    (void)sig;
-    running = false;
-}
+#include "st7735s/display.h"
 
 int main(void) {
-    signal(SIGINT, handle_sigint);
-
-    if (input_init() != 0) {
-        fprintf(stderr, "Failed to initialize inputs\n");
+    if (display_init() != 0) {
+        fprintf(stderr, "Failed to initialize ST7735S display\n");
         return 1;
     }
 
-    printf("==========================================\n");
-    printf(" ST7735S Input Test - Press Any Button\n");
-    printf(" (Press Ctrl+C to exit)\n");
-    printf("==========================================\n");
+    printf("Display initialized successfully. Testing colors...\n");
 
-    input_state state = {0};
+    // 1. Red fill
+    display_clear(COLOR_RED);
+    display_present();
+    sleep(1);
 
-    while (running) {
-        input_update(&state);
+    // 2. Green fill
+    display_clear(COLOR_GREEN);
+    display_present();
+    sleep(1);
 
-        // Joystick directions
-        if (input_just_pressed(&state, KEY_UP))    printf("-> JOYSTICK UP\n");
-        if (input_just_pressed(&state, KEY_DOWN))  printf("-> JOYSTICK DOWN\n");
-        if (input_just_pressed(&state, KEY_LEFT))  printf("-> JOYSTICK LEFT\n");
-        if (input_just_pressed(&state, KEY_RIGHT)) printf("-> JOYSTICK RIGHT\n");
-        if (input_just_pressed(&state, KEY_PRESS)) printf("-> JOYSTICK PRESS\n");
+    // 3. Blue fill
+    display_clear(COLOR_BLUE);
+    display_present();
+    sleep(1);
 
-        // Action buttons
-        if (input_just_pressed(&state, KEY_1))     printf("-> KEY 1\n");
-        if (input_just_pressed(&state, KEY_2))     printf("-> KEY 2\n");
-        if (input_just_pressed(&state, KEY_3))     printf("-> KEY 3\n");
-
-        // Release events
-        if (input_just_released(&state, KEY_1))    printf("   (KEY 1 released)\n");
-        if (input_just_released(&state, KEY_PRESS))printf("   (JOYSTICK released)\n");
-
-        usleep(20000); // 20ms poll rate (50Hz)
+    // 4. White canvas with a centered 10x10 black square
+    display_clear(COLOR_WHITE);
+    for (int y = 59; y < 69; ++y) {
+        for (int x = 59; x < 69; ++x) {
+            display_draw_pixel(x, y, COLOR_BLACK);
+        }
     }
+    display_present();
+    sleep(2);
 
-    input_close();
-    printf("\nClean shutdown.\n");
+    display_close();
+    printf("Test complete.\n");
     return 0;
 }
