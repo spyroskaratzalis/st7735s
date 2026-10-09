@@ -1,4 +1,4 @@
-#include "image.h"
+#include "st7735s/image.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>

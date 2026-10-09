@@ -1,6 +1,7 @@
-#include <stdint.h>
+#ifndef ST7735S_IMAGE_H
+#define ST7735S_IMAGE_H
 
-#pragma pack(push, 1)
+#include <stdint.h>
 
 typedef struct {
     uint16_t bfType;
@@ -8,7 +9,7 @@ typedef struct {
     uint16_t bfReserved1;
     uint16_t bfReversed2;
     uint32_t bfOffBits;
-} BMPFileHeader;
+} __attribute__((packed)) BMPFileHeader;
 
 typedef struct {
     uint32_t biSize;
@@ -22,9 +23,8 @@ typedef struct {
     int32_t biYPelsPerMeter;
     uint32_t biClrused;
     uint32_t biClrImportant;
-} BMPInfoHeader;
+} __attribute__((packed)) BMPInfoHeader;
 
-#pragma pack(pop)
 
 typedef struct {
     int width;
@@ -34,3 +34,5 @@ typedef struct {
 
 Image* image_load_bmp(const char *filepath);
 void   image_free(Image *img);
+
+#endif
