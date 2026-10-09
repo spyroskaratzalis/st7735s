@@ -1,41 +1,51 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "st7735s/display.h"
+#include "st7735s/graphics.h"
 
-int main(void) {
+int main(void)
+{
     if (display_init() != 0) {
-        fprintf(stderr, "Failed to initialize ST7735S display\n");
+        fprintf(stderr, "Failed to initialize display\n");
         return 1;
     }
 
-    printf("Display initialized successfully. Testing colors...\n");
+    // 1. Clear background
+    display_clear(COLOR_BLACK);
 
-    // 1. Red fill
-    display_clear(COLOR_RED);
-    display_present();
-    sleep(1);
+    // 2. Outer boundary border
+    graphics_draw_rect(0, 0, LCD_WIDTH, LCD_HEIGHT, COLOR_WHITE);
 
-    // 2. Green fill
-    display_clear(COLOR_GREEN);
-    display_present();
-    sleep(1);
+    // 3. Diagonal corner-to-corner X (Bresenham)
+    graphics_draw_line(0, 0, LCD_WIDTH - 1, LCD_HEIGHT - 1, COLOR_GRAY);
+    graphics_draw_line(0, LCD_HEIGHT - 1, LCD_WIDTH - 1, 0, COLOR_GRAY);
 
-    // 3. Blue fill
-    display_clear(COLOR_BLUE);
-    display_present();
-    sleep(1);
+    // 4. Rectangles: Outline (Cyan) and Solid Fill (Magenta)
+    graphics_draw_rect(10, 10, 30, 20, COLOR_CYAN);
+    graphics_fill_rect(14, 14, 22, 12, COLOR_MAGENTA);
 
-    // 4. White canvas with a centered 10x10 black square
-    display_clear(COLOR_WHITE);
-    for (int y = 59; y < 69; ++y) {
-        for (int x = 59; x < 69; ++x) {
-            display_draw_pixel(x, y, COLOR_BLACK);
-        }
-    }
+    // 5. Rectangles on the right: Outline (Yellow) and Solid Fill (Red)
+    graphics_draw_rect(88, 10, 30, 20, COLOR_YELLOW);
+    graphics_fill_rect(92, 14, 22, 12, COLOR_RED);
+
+    // 6. Circles: Concentric wireframes (Green, Blue)
+    graphics_draw_circle(64, 64, 40, COLOR_GREEN);
+    graphics_draw_circle(64, 64, 25, COLOR_BLUE);
+
+    // 7. Center target: Filled circle (Yellow) with Red center core
+    graphics_fill_circle(64, 64, 12, COLOR_YELLOW);
+    graphics_fill_circle(64, 64, 4, COLOR_RED);
+
+    // 8. Horizontal & vertical crosshairs through center
+    graphics_draw_fast_hline(44, 64, 40, COLOR_WHITE);
+    graphics_draw_fast_vline(64, 44, 40, COLOR_WHITE);
+
+    // Commit buffer to SPI
     display_present();
-    sleep(2);
+
+    printf("Test pattern displayed. Holding for 5 seconds...\n");
+    sleep(5);
 
     display_close();
-    printf("Test complete.\n");
     return 0;
 }
