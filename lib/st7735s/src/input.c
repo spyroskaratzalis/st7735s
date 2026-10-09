@@ -1,4 +1,4 @@
-#include "input.h"
+#include "st7735s/input.h"
 #include <stdio.h>
 #include <stddef.h>
 #include <lgpio.h>

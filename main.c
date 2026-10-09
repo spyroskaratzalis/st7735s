@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <stdbool.h>
-#include "input.h"
+#include "st7735s/input.h"
 
 static volatile bool running = true;
 
