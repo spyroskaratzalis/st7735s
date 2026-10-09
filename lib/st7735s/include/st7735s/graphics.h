@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "st7735s/image.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,6 +23,8 @@ void graphics_fill_rect(int x, int y, int w, int h, uint16_t color);
 // Circles via Midpoint Circle algorithm
 void graphics_draw_circle(int cx, int cy, int r, uint16_t color);
 void graphics_fill_circle(int cx, int cy, int r, uint16_t color);
+
+void graphics_draw_image(int x, int y, const Image *img);
 
 #ifdef __cplusplus
 }

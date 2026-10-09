@@ -6,6 +6,7 @@ add_library(st7735s STATIC
     src/input.c
     src/hal/hal_lgpio.c
     src/graphics.c
+    src/image.c
 )
 
 add_library(st7735s::st7735s ALIAS st7735s)

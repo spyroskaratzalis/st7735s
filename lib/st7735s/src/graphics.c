@@ -1,6 +1,5 @@
 #include "st7735s/graphics.h"
 #include "st7735s/display.h"
-#include "st7735s/image.h"
 #include <stdlib.h>
 
 void graphics_draw_fast_hline(int x, int y, int w, uint16_t color) {
