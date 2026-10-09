@@ -10,6 +10,28 @@
 #include <stdio.h>  //printf()
 #include <stdlib.h> //exit()sudo apt install p7zip-full
 #include <time.h>
+
+#define KEY_UP_BIT       (1 << 0)
+#define KEY_DOWN_BIT     (1 << 1)
+#define KEY_LEFT_BIT     (1 << 2)
+#define KEY_RIGHT_BIT    (1 << 3)
+#define KEY_PRESS_BIT    (1 << 4)
+#define KEY1_BIT         (1 << 5)
+#define KEY2_BIT         (1 << 6)
+#define KEY3_BIT         (1 << 7)
+
+uint8_t read_all_keys() {
+    uint8_t mask = 0;
+    if(!DEV_Digital_Read(KEY_UP_PIN)) mask |= KEY_UP_BIT;
+    if (!DEV_Digital_Read(KEY_DOWN_PIN))    mask |= KEY_DOWN_BIT;
+    if (!DEV_Digital_Read(KEY_LEFT_PIN))    mask |= KEY_LEFT_BIT;
+    if (!DEV_Digital_Read(KEY_RIGHT_PIN))   mask |= KEY_RIGHT_BIT;
+    if (!DEV_Digital_Read(KEY_PRESS_PIN))   mask |= KEY_PRESS_BIT;
+    if (!DEV_Digital_Read(KEY1_PIN))        mask |= KEY1_BIT;
+    if (!DEV_Digital_Read(KEY2_PIN))        mask |= KEY2_BIT;
+    if (!DEV_Digital_Read(KEY3_PIN))        mask |= KEY3_BIT;
+    return mask;
+}
 // extern LCD_DIS sLCD_DIS;
 /************************************
 When using the button
@@ -34,7 +56,6 @@ void KEY_1in44_test(void) {
     // printf("1.44inch LCD KEY demo...\r\n");
     // LCD_1in44_Init(LCD_ScanDir);
     // LCD_1in44_Clear(WHITE);
-
     UWORD *BlackImage;
     UWORD Imagesize = LCD_HEIGHT * LCD_WIDTH;
     if ((BlackImage = (UWORD *)malloc(Imagesize)) == NULL) {
