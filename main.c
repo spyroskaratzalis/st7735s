@@ -30,6 +30,8 @@ int main(void)
     // 4. Blit image centered at (0, 0)
     graphics_draw_image(0, 0, img);
 
+    graphics_draw_fast_hline(0, 100, 100, COLOR_BLUE);
+
     // 5. Push to physical screen
     display_present();
     printf("Image pushed to display. Showing for 5 seconds...\n");
