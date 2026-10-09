@@ -19,38 +19,36 @@ int main(void) {
         return 1;
     }
 
-    printf("Input driver ready. Press buttons/joystick (Ctrl+C to quit)...\n");
+    printf("==========================================\n");
+    printf(" ST7735S Input Test - Press Any Button\n");
+    printf(" (Press Ctrl+C to exit)\n");
+    printf("==========================================\n");
 
     input_state state = {0};
 
     while (running) {
         input_update(&state);
 
-        // 1. Edge triggers (fires once per press, no spamming)
-        if (input_just_pressed(&state, KEY_1)) {
-            printf("[EDGE] KEY1 clicked once\n");
-        }
-        if (input_just_pressed(&state, KEY_PRESS)) {
-            printf("[EDGE] Joystick center pressed\n");
-        }
+        // Joystick directions
+        if (input_just_pressed(&state, KEY_UP))    printf("-> JOYSTICK UP\n");
+        if (input_just_pressed(&state, KEY_DOWN))  printf("-> JOYSTICK DOWN\n");
+        if (input_just_pressed(&state, KEY_LEFT))  printf("-> JOYSTICK LEFT\n");
+        if (input_just_pressed(&state, KEY_RIGHT)) printf("-> JOYSTICK RIGHT\n");
+        if (input_just_pressed(&state, KEY_PRESS)) printf("-> JOYSTICK PRESS\n");
 
-        // 2. Chords / simultaneous checks (holding diagonal or multiple buttons)
-        if (input_is_held(&state, KEY_UP | KEY_RIGHT)) {
-            printf("[CHORD] Diagonal: UP + RIGHT held\n");
-        }
-        if (input_is_held(&state, KEY_1 | KEY_2)) {
-            printf("[CHORD] KEY1 + KEY2 held together\n");
-        }
+        // Action buttons
+        if (input_just_pressed(&state, KEY_1))     printf("-> KEY 1\n");
+        if (input_just_pressed(&state, KEY_2))     printf("-> KEY 2\n");
+        if (input_just_pressed(&state, KEY_3))     printf("-> KEY 3\n");
 
-        // 3. Release check
-        if (input_just_released(&state, KEY_1)) {
-            printf("[EDGE] KEY1 released\n");
-        }
+        // Release events
+        if (input_just_released(&state, KEY_1))    printf("   (KEY 1 released)\n");
+        if (input_just_released(&state, KEY_PRESS))printf("   (JOYSTICK released)\n");
 
-        usleep(20000); // 20 ms poll rate (~50 Hz)
+        usleep(20000); // 20ms poll rate (50Hz)
     }
 
     input_close();
-    printf("\nClean exit.\n");
+    printf("\nClean shutdown.\n");
     return 0;
 }
