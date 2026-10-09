@@ -13,8 +13,8 @@
 #define RST_PIN 27
 #define BL_PIN 24
 
-#define LCD_OFFSET_X 1
-#define LCD_OFFSET_Y 2
+#define LCD_OFFSET_X 2
+#define LCD_OFFSET_Y 1
 
 #define CHUNK_PIXELS 1024
 
@@ -50,7 +50,7 @@ static const DisplayInitCmd INIT_SEQUENCE[] = {
     { 0xC5, 1,  {0x0E}, 0 },                                              // VMCTR1 (VCOM)
 
     // 5. Memory Access Control (Orientation: BGR order, row/col exchange)
-    { 0x36, 1,  {0xC8}, 0 },                                              // MADCTL
+    { 0x36, 1,  {0x08}, 0 },                                              // MADCTL
 
     // 6. Gamma Calibration (Positive & Negative curves)
     { 0xE0, 16, {0x0F, 0x1A, 0x0F, 0x18, 0x2F, 0x28, 0x20, 0x22,
