@@ -1,45 +1,85 @@
+#include <stdbool.h>
 #include <stdio.h>
+#include <time.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+
 #include "st7735s/display.h"
 #include "st7735s/graphics.h"
 #include "st7735s/image.h"
+#include "st7735s/input.h"
 
-int main(void)
-{
-    // 1. Initialize ST7735S hardware
+#define FILEPATH "frames/spiderman.gif"
+
+Image* frames = NULL;
+int frame_count = 0;
+volatile sig_atomic_t have_to_close = 0;
+
+void intHandler(int sig) {
+    have_to_close = 1;
+}
+
+int main(void) {
+    bool paused = 0;
+    input_state state = {0, 0, 0};
+
+    signal(SIGINT, intHandler);
+
     if (display_init() != 0) {
         fprintf(stderr, "Failed to initialize display\n");
         return 1;
     }
+    if (input_init() != 0) {
+        fprintf(stderr, "Failed to initialize inputs\n");
+        return 1;
+    }
+    display_clear(COLOR_BLACK);
 
-    printf("Loading test.bmp...\n");
+    struct timespec start_time, end_time;
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+    printf("Loading gif into ram.\n");
 
-    // 2. Load the BMP using your custom parser
-    Image *img = image_load_bmp("bigchungus.bmp");
-    if (!img) {
-        fprintf(stderr, "Failed to load test.bmp\n");
+    frames = image_load_gif(FILEPATH, &frame_count);
+    clock_gettime(CLOCK_MONOTONIC, &end_time);
+
+    if (!frames || frame_count <= 0) {
+        fprintf(stderr, "Failed to load GIF frames from %s\n", FILEPATH);
+        input_close();
         display_close();
         return 1;
     }
 
-    printf("Loaded image: %dx%d px\n", img->width, img->height);
+    double dt = (end_time.tv_sec - start_time.tv_sec) * 1000.0 +
+                (end_time.tv_nsec - start_time.tv_nsec) / 1000000.0;
+    double fps = (double)frame_count * 1000.0 / dt;
+    printf("Loaded %d frames into ram in %.2f milliseconds. That's %.2f frames per second\n", frame_count, dt, fps);
 
-    // 3. Clear the screen to black
     display_clear(COLOR_BLACK);
 
-    // 4. Blit image centered at (0, 0)
-    graphics_draw_image(0, 0, img);
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+    printf("Playing gif.");
+    int i = 0;
+    while (!have_to_close) {
+        input_update(&state);
+        if (input_just_pressed(&state, KEY_1)) {
+            paused = !paused;
+        }
+        if (!paused) {
+            graphics_draw_image(0, 0, frames + i);
+            display_present();
+            i = (i + 1) % frame_count;
+        }        
+    }
+    image_array_free(frames, frame_count);
+    clock_gettime(CLOCK_MONOTONIC, &end_time);
+    dt = (end_time.tv_sec - start_time.tv_sec) * 1000.0 +
+         (end_time.tv_nsec - start_time.tv_nsec) / 1000000.0;
+    fps = (double)frame_count * 1000.0 / dt;
+    printf("Played %d frames in %.2f milliseconds. That's %.2f frames per second\n", frame_count, dt, fps);
 
-    graphics_draw_fast_hline(0, 100, 100, COLOR_BLUE);
-
-    // 5. Push to physical screen
-    display_present();
-    printf("Image pushed to display. Showing for 5 seconds...\n");
-
-    sleep(5);
-
-    // 6. Clean up memory and hardware handles
-    image_free(img);
+    input_close();
     display_close();
 
     printf("Test complete and resources released.\n");

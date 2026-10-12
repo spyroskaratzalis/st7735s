@@ -17,6 +17,7 @@ void graphics_draw_fast_vline(int x, int y, int h, uint16_t color) {
 }
 
 void graphics_draw_rect(int x, int y, int w, int h, uint16_t color) {
+    if(w <= 0 || h <= 0) return;
     graphics_draw_fast_hline(x, y, w, color);
     graphics_draw_fast_hline(x, y + h - 1, w, color);
     graphics_draw_fast_vline(x, y, h, color);
@@ -70,44 +71,35 @@ void graphics_draw_circle(int cx, int cy, int r, uint16_t color) {
     }
 }
 
-void graphics_fill_circle(int cx, int cy, int r, uint16_t color)
-{
+#include <math.h>
+
+void graphics_fill_circle(int cx, int cy, int r, uint16_t color) {
     if (r < 0) return;
     if (r == 0) {
         display_draw_pixel(cx, cy, color);
         return;
     }
 
-    int x = 0;
-    int y = r;
-    int d = 3 - (2 * r);
-
-    while (y >= x) {
-        // Draw horizontal spans between symmetrical pairs
-        graphics_draw_fast_hline(cx - x, cy + y, 2 * x + 1, color);
-        graphics_draw_fast_hline(cx - x, cy - y, 2 * x + 1, color);
-        graphics_draw_fast_hline(cx - y, cy + x, 2 * y + 1, color);
-        graphics_draw_fast_hline(cx - y, cy - x, 2 * y + 1, color);
-
-        if (d <= 0) {
-            d += (4 * x) + 6;
-        } else {
-            d += 4 * (x - y) + 10;
-            y--;
-        }
-        x++;
+    // Exact scanline rasterization across the vertical extent:
+    // For each scanline dy from -r to +r, calculate horizontal half-width dx.
+    // Each row is visited and drawn exactly once, preventing overdraw artifacts.
+    int r2 = r * r;
+    for (int dy = -r; dy <= r; ++dy) {
+        int dx = (int)(sqrt((double)(r2 - dy * dy)) + 0.5);
+        graphics_draw_fast_hline(cx - dx, cy + dy, 2 * dx + 1, color);
     }
 }
 
-void graphics_draw_bitmap(int x, int y, int w, int h, const uint16_t *pixels)
-{
+void graphics_draw_bitmap(int x, int y, int w, int h, const uint16_t *pixels) {
+    if (!pixels || w <= 0 || h <= 0) return;
+
     for (int row = 0; row < h; ++row) {
         int py = y + row;
-        if (py < 0 || py >= LCD_HEIGHT) continue; // Row clipping
+        if (py < 0 || py >= LCD_HEIGHT) continue;
 
         for (int col = 0; col < w; ++col) {
             int px = x + col;
-            if (px < 0 || px >= LCD_WIDTH) continue; // Col clipping
+            if (px < 0 || px >= LCD_WIDTH) continue;
 
             uint16_t color = pixels[row * w + col];
             display_draw_pixel(px, py, color);

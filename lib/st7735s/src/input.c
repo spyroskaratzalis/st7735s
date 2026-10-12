@@ -22,7 +22,6 @@ static const KeyMapping KEY_MAP[] = {
 #define KEY_COUNT (sizeof(KEY_MAP) / sizeof(KEY_MAP[0]))
 
 static int s_gpio_handle = -1;
-static uint8_t s_prev_raw = 0;
 
 int input_init() {
     if(s_gpio_handle >= 0) return 0; // Already Initialized
@@ -38,7 +37,6 @@ int input_init() {
             return -1;
         }
     }
-    s_prev_raw = 0;
     return 0;
 }
 
@@ -57,11 +55,10 @@ void input_update(input_state *state) {
         if(level == 0) raw |= KEY_MAP[i].mask;
     }
 
+    uint8_t prev = state->current_state;
     state->current_state = raw;
-    state->pressed_edge = raw & (uint8_t)(~s_prev_raw);
-    state->released_edge = (uint8_t)(~raw) & s_prev_raw;
-
-    s_prev_raw=raw;
+    state->pressed_edge = raw & (uint8_t)(~prev);
+    state->released_edge = (uint8_t)(~raw) & prev;
 }
 
 void input_close(void) {
@@ -69,5 +66,4 @@ void input_close(void) {
         lgGpiochipClose(s_gpio_handle);
         s_gpio_handle = -1;
     }
-    s_prev_raw = 0;
 }

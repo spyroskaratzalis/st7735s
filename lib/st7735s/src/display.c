@@ -94,7 +94,7 @@ static void display_set_window(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
 
     display_write_cmd(0x2a);
     display_write_data_byte(0x00);
-    display_write_data_byte(x0);
+    display_write_data_byte(x0);    
     display_write_data_byte(0x00);
     display_write_data_byte(x1);
 
@@ -143,11 +143,11 @@ int display_init() {
             if (entry->delay_ms > 0) {
                 usleep(entry->delay_ms * 1000);
             }
-    }
-
-    lgGpioWrite(s_gpio_handle, BL_PIN, 1);
-
     display_clear(COLOR_BLACK);
+    display_present();
+
+    // Turn backlight on after initial frame is flushed to avoid screen flash
+    lgGpioWrite(s_gpio_handle, BL_PIN, 1);
     return 0;
 }
 
