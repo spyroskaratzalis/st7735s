@@ -211,6 +211,11 @@ When I refactor this towards an industrial-grade driver, my roadmap will be:
 
 ---
 
+
+
+## NOTE:
+Big part of README and code comments helped by AI. Core logic written by myself, but using AI as general mentor for what I should improve.
+
 ## License & Credits
 
 - Code released under the **MIT License**.
