@@ -6,13 +6,11 @@ A lightweight, memory-buffered C11 driver I built for the Sitronix **ST7735S** T
 
 ## 1. Why I Built This
 
-When I first got my hands on the Waveshare 1.44" LCD HAT, I tried using their official demo code. It was painful:
+The Wavshare 1.44" LCD HAT is very painful to use:
 
 - **Dead libraries:** It relied heavily on `wiringPi` (abandoned years ago) and direct physical register access via `bcm2835` (which flat-out crashes on modern 6.x kernels and the Raspberry Pi 5).
 - **Spaghetti architecture:** Hundreds of lines of register pokes, fonts, button polling, and BMP decoding crammed into monolithic files with messy global state.
 - **Painfully slow rendering:** Primitives were drawn directly over SPI one pixel or line at a time. Every line required multiple SPI command handshakes, resulting in visible tearing, sluggish frame rates, and massive syscall overhead.
-
-I wanted something clean, readable, and written in modern C11 that actually compiles and runs smoothly on current Raspberry Pi OS (Debian Bookworm) without pulling in legacy bloat.
 
 ---
 
@@ -20,7 +18,7 @@ I wanted something clean, readable, and written in modern C11 that actually comp
 
 I want to be upfront: **this is not an industry-standard, production-grade embedded driver.** 
 
-While it's a massive upgrade over vendor sample code, it still makes classic "hobbyist/application-level" compromises:
+While it's a massive upgrade over the original driver, it's far from modern or complete. Here are a few issues I plan on fixing:
 
 1. **It relies on global static singletons:** If you look at `display.c`, handles and buffers (`s_spi_handle`, `s_framebuffer`, `s_gpio_handle`) are file-scoped `static` variables. If you wanted to run two screens side-by-side on CE0 and CE1, you couldn't do it without duplicating or rewriting the code.
 2. **It's tightly coupled to Linux and `lgpio`:** Real embedded drivers don't `#include <lgpio.h>`. They don't know what an OS is. They communicate through a decoupled Hardware Abstraction Layer (HAL) or bus interface. This driver won't compile on an STM32, ESP32, or desktop simulator without surgery.
@@ -29,11 +27,9 @@ While it's a massive upgrade over vendor sample code, it still makes classic "ho
 5. **It hardcodes panel dimensions and offsets:** The 128x128 resolution and `(1, 2)` glass offsets are baked into `#define` constants rather than dynamic runtime descriptors.
 6. **It bundles buttons with the display:** An ST7735S chip has no idea what a joystick is. In a proper architecture, inputs live in a Board Support Package (BSP) or input subsystem, completely separate from the display driver.
 
-I chose this design deliberately as a **first milestone**: get a clean, tear-free, readable driver running on Linux first before introducing architectural layers of abstraction.
+Here is an breakdown of my code compared to industrial embedded standards:
 
-Here is an honest breakdown of where my code sits compared to industrial embedded standards (like Zephyr RTOS, Linux DRM/fbtft, or LVGL):
-
-| Dimension | How I Did It Here | Industry-Standard Production C |
+| Dimension | Current Version | Industry-Standard Production C |
 | :--- | :--- | :--- |
 | **Instance Model** | Global singletons (`static uint16_t s_framebuffer[]`) | **Opaque context handles** (`st7735s_t* dev`) passed to every API function. |
 | **Hardware Coupling** | Direct calls to Linux `lgpio` and `/dev/spidev0.0` | **Abstracted Bus / HAL Layer** via function pointers (`write_cmd`, `write_data`, `set_pin`). |
@@ -47,14 +43,12 @@ Here is an honest breakdown of where my code sits compared to industrial embedde
 
 ## 3. Why I Made The Choices I Did
 
-Even with those limitations, every technical choice in this repo was made for a specific practical reason:
-
 ### A. Choosing `lgpio` over `wiringPi` or `/dev/mem`
 Older Raspberry Pi tutorials tell you to use `wiringPi` or `bcm2835`. On modern kernels (6.6+) and the Raspberry Pi 5, those fail because direct register access via `/dev/mem` is blocked and GPIO registers have physically moved to the RP1 southbridge chip. 
 
 I picked **`lgpio`** because it uses the modern Linux GPIO character device interface (`/dev/gpiochip*`). This gives me kernel-level pin arbitration, clean process cleanup on `Ctrl+C`, and internal pull-up support (`LG_SET_PULL_UP`) out of the box.
 
-### B. Why I Chose a 32 KiB In-Memory Framebuffer
+### B. Choosing a 32 KiB In-Memory Framebuffer
 Drawing directly over SPI requires sending an 11-byte window command sequence (`CASET`, `RASET`, `RAMWR`) for every primitive you draw. If you draw a 100-pixel line, that’s dozens of SPI bus transactions and context switches.
 
 Instead, I allocated a contiguous **32 KiB buffer** in RAM (`128 * 128 * 2` bytes for RGB565):
@@ -93,21 +87,7 @@ Depending on the panel's scan orientation (`MADCTL` register `0x36`), the visibl
 - `LCD_OFFSET_X = 1`
 - `LCD_OFFSET_Y = 2`
 
-I baked these offsets into `display_set_window()` so my drawing code can work in an intuitive `(0, 0)` to `(127, 127)` coordinate space.
-
-### G. Scanline Rasterization for Circles
-A naive adaptation of the Midpoint Circle algorithm for filled circles replaces pixel pairs with four horizontal lines per iteration. However, because $x$ increments by 1 on every step while $y$ steps coarsely, rows near the top and bottom get repeatedly redrawn with expanding widths, and rows near $y=r$ are drawn with full diameter, creating a squarish/bulging shape.
-
-In `graphics_fill_circle()`, I switched to exact scanline rasterization:
-For every row $dy \in [-r, +r]$, I calculate the exact half-width $dx = \text{round}(\sqrt{r^2 - dy^2})$ and draw one horizontal span:
-```c
-int r2 = r * r;
-for (int dy = -r; dy <= r; ++dy) {
-    int dx = (int)(sqrt((double)(r2 - dy * dy)) + 0.5);
-    graphics_draw_fast_hline(cx - dx, cy + dy, 2 * dx + 1, color);
-}
-```
-Every row is visited and drawn **exactly once**, eliminating visual distortion and duplicate overdraw.
+These offsets are built into `display_set_window()` so the drawing code can work in an intuitive `(0, 0)` to `(127, 127)` coordinate space.
 
 ---
 

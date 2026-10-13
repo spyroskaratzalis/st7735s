@@ -3,3 +3,4 @@ build/
 lgpio.h
 frames
 *.bmp
+.vscode
