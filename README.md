@@ -16,7 +16,7 @@ I wanted something clean, readable, and written in modern C11 that actually comp
 
 ---
 
-## 2. The Elephant in the Room: Let's Be Honest, This Isn't a "Modern" Driver (Yet)
+## 2. This Isn't a "Modern" Driver (Yet)
 
 I want to be upfront: **this is not an industry-standard, production-grade embedded driver.** 
 
