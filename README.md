@@ -94,15 +94,14 @@ These offsets are built into `display_set_window()` so the drawing code can work
 ## 4. Codebase Layout
 
 ```
-lib/st7735s/
-├── include/st7735s/
-│   ├── st7735s.h     # Master umbrella header
-│   ├── display.h     # Hardware lifecycle, SPI management, and framebuffer flushing
-│   ├── graphics.h    # 2D primitives: lines, rects, circles, bitmaps, clipping
-│   ├── image.h       # 24-bit uncompressed BMP parser and animated GIF decoder
-│   ├── input.h       # 5-way joystick & 3 user button inputs with edge triggers
-│   └── stb_image.h   # Public-domain image decoder engine
-└── src/
+─ include/st7735s/
+  ├── st7735s.h     # Master umbrella header
+  ├── display.h     # Hardware lifecycle, SPI management, and framebuffer flushing
+  ├── graphics.h    # 2D primitives: lines, rects, circles, bitmaps, clipping
+  ├── image.h       # 24-bit uncompressed BMP parser and animated GIF decoder
+  ├── input.h       # 5-way joystick & 3 user button inputs with edge triggers
+  └── stb_image.h   # Public-domain image decoder engine
+─ src/
     ├── display.c     # Display initialization, reset timing, SPI streaming
     ├── graphics.c    # Raster algorithms (Bresenham lines, scanline circles)
     ├── image.c       # BMP and GIF loading pipelines
